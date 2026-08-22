@@ -8,13 +8,13 @@ import os
 
 # 페이지 설정
 st.set_page_config(
-    page_title="주식 & 지수 수익률 비교 대시보드",
+    page_title="주식 & 지수 수익률 비교",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # 제목 및 소개
-st.title("📈 국내외 주식 & 지수 수익률 비교 대시보드")
+st.title("📈 국내외 주식 & 지수 수익률 비교")
 st.markdown("""
 한국 및 미국 주식과 주요 지수의 누적 수익률을 비교할 수 있는 대시보드입니다.  
 시작일의 자산 가격을 **100%** 기준으로 설정하여 종료일까지의 상대적인 변동 추이를 백분율(%)로 보여줍니다.
