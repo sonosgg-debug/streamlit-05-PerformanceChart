@@ -151,14 +151,6 @@ stock_input1 = st.sidebar.text_input("종목 1", value="삼성전자", placehold
 stock_input2 = st.sidebar.text_input("종목 2 (선택)", value="", placeholder="예: SK하이닉스, 000660, TSLA")
 stock_input3 = st.sidebar.text_input("종목 3 (선택)", value="", placeholder="예: 현대차, 005380, MSFT")
 
-st.sidebar.markdown("""
-<div style="font-size:0.85rem; color:#666; margin-top:-10px; margin-bottom:15px;">
-💡 <b>입력 가이드</b><br/>
-• <b>한국 주식</b>: 종목명(삼성전자) 또는 6자리 코드(005930)<br/>
-• <b>미국 주식</b>: 티커 심볼(AAPL, TSLA, NVDA)
-</div>
-""", unsafe_allow_html=True)
-
 st.sidebar.subheader("📊 지수 선택 (최대 2개)")
 indices_options = {
     "KOSPI": "^KS11",
