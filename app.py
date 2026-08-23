@@ -14,11 +14,13 @@ st.set_page_config(
 )
 
 # 제목 및 소개
-st.title("📈 국내외 주식 & 지수 수익률 비교")
+st.markdown("<h1 style='color: #8AB4F8; margin-bottom: 10px;'>국내외 주식 & 지수 수익률 비교</h1>", unsafe_allow_html=True)
 st.markdown("""
-한국 및 미국 주식과 주요 지수의 누적 수익률을 비교할 수 있는 대시보드입니다.  
-시작일의 자산 가격을 **100%** 기준으로 설정하여 종료일까지의 상대적인 변동 추이를 백분율(%)로 보여줍니다.
-""")
+<div style="color: #BDC1C6; font-size: 1.1rem; margin-bottom: 20px; line-height: 1.6;">
+한국 및 미국 주식과 주요 지수의 누적 수익률을 비교할 수 있는 대시보드입니다.<br/>
+시작일의 자산 가격을 <b>100%</b> 기준으로 설정하여 종료일까지의 상대적인 변동 추이를 백분율(%)로 보여줍니다.
+</div>
+""", unsafe_allow_html=True)
 
 # --- 데이터 캐싱 및 매핑 로직 ---
 
