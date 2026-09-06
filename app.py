@@ -215,6 +215,13 @@ for idx, opt in enumerate(stock_select_options):
         default_idx1 = idx
         break
 
+# 종목 2 디폴트 인덱스 (엔비디아)
+default_idx2 = 0
+for idx, opt in enumerate(stock_select_options):
+    if "엔비디아 (NVDA)" in opt:
+        default_idx2 = idx
+        break
+
 # 사이드바 설정
 st.sidebar.header("⚙️ 대시보드 설정")
 
@@ -232,7 +239,7 @@ if stock_select1 == "[직접 입력]":
 stock_select2 = st.sidebar.selectbox(
     "종목 2 (선택)",
     options=stock_select_options,
-    index=0,
+    index=default_idx2,
     help="키보드로 종목명 또는 종목코드를 입력하여 검색할 수 있습니다."
 )
 custom_stock2 = None
@@ -371,35 +378,43 @@ if run_button or 'data_loaded' not in st.session_state:
             # --- 차트 그리기 (Plotly) ---
             fig = go.Figure()
             
-            for display_name, series_normalized in data_dict.items():
+            chart_colors = ['#38BDF8', '#F43F5E', '#10B981', '#FBBF24', '#A855F7', '#EC4899', '#6366F1']
+            for i, (display_name, series_normalized) in enumerate(data_dict.items()):
+                c = chart_colors[i % len(chart_colors)]
                 fig.add_trace(go.Scatter(
                     x=series_normalized.index,
                     y=series_normalized.values,
                     mode='lines',
                     name=display_name,
+                    line=dict(width=2.5, color=c),
                     hovertemplate='%{x|%Y-%m-%d}<br><b>' + display_name + '</b>: %{y:.2f}%<extra></extra>'
                 ))
             
+            # 32 FinancialChart 테마 적용 (슬레이트 다크 그레이 & 고대비 텍스트)
             fig.update_layout(
                 title=dict(
                     text=f"<b>수익률 비교 차트 ({start_date} ~ {end_date}, 시작가 = 100%)</b>",
                     x=0.0,
-                    font=dict(size=18)
+                    font=dict(size=18, color="#F8FAFC")
                 ),
                 xaxis=dict(
                     title="날짜",
-                    gridcolor="#f2dec9",
+                    gridcolor="#2A3342",
                     showline=True,
                     linewidth=1,
-                    linecolor="#d7beab"
+                    linecolor="#3E4C5E",
+                    tickfont=dict(color="#E2E8F0"),
+                    titlefont=dict(color="#E2E8F0")
                 ),
                 yaxis=dict(
                     title="수익률 지수 (%)",
-                    gridcolor="#f2dec9",
+                    gridcolor="#2A3342",
                     showline=True,
                     linewidth=1,
-                    linecolor="#d7beab",
-                    ticksuffix="%"
+                    linecolor="#3E4C5E",
+                    ticksuffix="%",
+                    tickfont=dict(color="#E2E8F0"),
+                    titlefont=dict(color="#E2E8F0")
                 ),
                 hovermode="x unified",
                 legend=dict(
@@ -408,13 +423,23 @@ if run_button or 'data_loaded' not in st.session_state:
                     y=1.02,
                     xanchor="right",
                     x=1,
-                    font=dict(size=12)
+                    font=dict(size=12, color="#E2E8F0"),
+                    bgcolor="rgba(30, 36, 48, 0.9)",
+                    bordercolor="#3E4C5E",
+                    borderwidth=1
+                ),
+                hoverlabel=dict(
+                    bgcolor="#0F172A",
+                    font_color="#FFFFFF",
+                    font_size=12,
+                    bordercolor="#3E4C5E"
                 ),
                 font=dict(
-                    color="#3c2f2f"  # 주황색 배경과 조화로우면서도 가독성이 높은 짙은 에스프레소 브라운 색상 고정
+                    family="Pretendard, Malgun Gothic, -apple-system, sans-serif",
+                    color="#E2E8F0"
                 ),
-                plot_bgcolor="#fffdf9",   # 내부 그리기 영역: 매우 부드러운 웜 아이보리 화이트
-                paper_bgcolor="#ffebd6",  # 외부 배경 영역: 화사하고 은은한 파스텔톤 연오렌지(피치)
+                plot_bgcolor="#161B24",   # 32 FinancialChart 딥 슬레이트 그레이 플롯 영역
+                paper_bgcolor="#1E2430",  # 32 FinancialChart 엘레강트 슬레이트 다크 그레이 페이퍼 영역
                 margin=dict(l=40, r=40, t=80, b=40),
                 height=550
             )
