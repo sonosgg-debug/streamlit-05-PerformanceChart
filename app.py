@@ -398,23 +398,21 @@ if run_button or 'data_loaded' not in st.session_state:
                     font=dict(size=18, color="#F8FAFC")
                 ),
                 xaxis=dict(
-                    title="날짜",
+                    title=dict(text="날짜", font=dict(color="#E2E8F0")),
                     gridcolor="#2A3342",
                     showline=True,
                     linewidth=1,
                     linecolor="#3E4C5E",
-                    tickfont=dict(color="#E2E8F0"),
-                    titlefont=dict(color="#E2E8F0")
+                    tickfont=dict(color="#E2E8F0")
                 ),
                 yaxis=dict(
-                    title="수익률 지수 (%)",
+                    title=dict(text="수익률 지수 (%)", font=dict(color="#E2E8F0")),
                     gridcolor="#2A3342",
                     showline=True,
                     linewidth=1,
                     linecolor="#3E4C5E",
                     ticksuffix="%",
-                    tickfont=dict(color="#E2E8F0"),
-                    titlefont=dict(color="#E2E8F0")
+                    tickfont=dict(color="#E2E8F0")
                 ),
                 hovermode="x unified",
                 legend=dict(
