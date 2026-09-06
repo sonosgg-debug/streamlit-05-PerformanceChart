@@ -126,6 +126,34 @@ def resolve_ticker(input_str, krx_df):
     display_name = get_us_stock_name(symbol)
     return symbol, display_name
 
+def resolve_stock_selection(selected_display, krx_df):
+    """
+    선택된 '종목명 (코드/티커)' 문자열을 파싱하여 yfinance 티커와 표시 이름으로 변환합니다. (32 FinancialChart 방식)
+    """
+    if not selected_display or selected_display == "선택 안 함":
+        return None, None
+
+    if "(" in selected_display and selected_display.endswith(")"):
+        code_part = selected_display.split("(")[-1].replace(")", "").strip()
+        name_part = selected_display.split("(")[0].strip()
+
+        # 한국 6자리 종목 코드인 경우
+        if code_part.isdigit() and len(code_part) == 6:
+            code_match = krx_df[krx_df['Code'] == code_part]
+            if not code_match.empty:
+                market = code_match.iloc[0]['Market']
+                name = code_match.iloc[0]['Name']
+                suffix = '.KS' if market == 'KOSPI' else '.KQ'
+                return f"{code_part}{suffix}", name
+            return f"{code_part}.KS", name_part
+        else:
+            # 미국 주식 티커
+            symbol = code_part.upper()
+            return symbol, name_part
+
+    # 그 외 직접 입력된 텍스트 처리
+    return resolve_ticker(selected_display, krx_df)
+
 def format_price(value, ticker):
     """자산 종류에 맞게 화폐 단위 및 가격을 포맷팅합니다."""
     if ticker.startswith('^'):
@@ -145,13 +173,81 @@ def format_return(value):
 # KRX 데이터 로드
 krx_df = load_krx_data()
 
+# 종목 리스트 포맷팅 (32 FinancialChart 방식: 종목명 (코드))
+if not krx_df.empty:
+    krx_display_names = (krx_df['Name'] + " (" + krx_df['Code'] + ")").tolist()
+else:
+    krx_display_names = []
+
+# 주요 미국 주식 목록 (한국어 종목명 + 티커)
+us_stocks = [
+    "애플 (AAPL)",
+    "마이크로소프트 (MSFT)",
+    "엔비디아 (NVDA)",
+    "테슬라 (TSLA)",
+    "아마존 (AMZN)",
+    "알파벳A (GOOGL)",
+    "메타 (META)",
+    "버크셔해서웨이 (BRK-B)",
+    "브로드컴 (AVGO)",
+    "TSMC (TSM)",
+    "일라이릴리 (LLY)",
+    "JP모건 (JPM)",
+    "월마트 (WMT)",
+    "비자 (V)",
+    "엑슨모빌 (XOM)",
+    "넷플릭스 (NFLX)",
+    "코스트코 (COST)",
+    "ASML (ASML)",
+    "AMD (AMD)",
+    "퀄컴 (QCOM)",
+    "팔란티어 (PLTR)",
+    "아이온큐 (IONQ)",
+    "인텔 (INTC)"
+]
+
+stock_select_options = ["선택 안 함"] + krx_display_names + us_stocks + ["[직접 입력]"]
+
+# 종목 1 디폴트 인덱스 (삼성전자)
+default_idx1 = 0
+for idx, opt in enumerate(stock_select_options):
+    if "삼성전자 (005930)" in opt:
+        default_idx1 = idx
+        break
+
 # 사이드바 설정
 st.sidebar.header("⚙️ 대시보드 설정")
 
-st.sidebar.subheader("🔍 종목 입력 (최대 3개)")
-stock_input1 = st.sidebar.text_input("종목 1", value="삼성전자", placeholder="예: 삼성전자, 005930, AAPL")
-stock_input2 = st.sidebar.text_input("종목 2 (선택)", value="", placeholder="예: SK하이닉스, 000660, TSLA")
-stock_input3 = st.sidebar.text_input("종목 3 (선택)", value="", placeholder="예: 현대차, 005380, MSFT")
+st.sidebar.subheader("🔍 종목 선택 (최대 3개)")
+stock_select1 = st.sidebar.selectbox(
+    "종목 1",
+    options=stock_select_options,
+    index=default_idx1,
+    help="키보드로 종목명(예: 삼성전자) 또는 종목코드(예: 005930)를 입력하여 검색할 수 있습니다."
+)
+custom_stock1 = None
+if stock_select1 == "[직접 입력]":
+    custom_stock1 = st.sidebar.text_input("종목 1 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
+
+stock_select2 = st.sidebar.selectbox(
+    "종목 2 (선택)",
+    options=stock_select_options,
+    index=0,
+    help="키보드로 종목명 또는 종목코드를 입력하여 검색할 수 있습니다."
+)
+custom_stock2 = None
+if stock_select2 == "[직접 입력]":
+    custom_stock2 = st.sidebar.text_input("종목 2 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
+
+stock_select3 = st.sidebar.selectbox(
+    "종목 3 (선택)",
+    options=stock_select_options,
+    index=0,
+    help="키보드로 종목명 또는 종목코드를 입력하여 검색할 수 있습니다."
+)
+custom_stock3 = None
+if stock_select3 == "[직접 입력]":
+    custom_stock3 = st.sidebar.text_input("종목 3 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
 
 st.sidebar.subheader("📊 지수 선택 (최대 2개)")
 indices_options = {
@@ -195,14 +291,27 @@ if run_button or 'data_loaded' not in st.session_state:
     # 1. 입력 종목 및 지수 리스트 정리
     targets = []
     
-    # 종목 분석
-    for i, stock_input in enumerate([stock_input1, stock_input2, stock_input3]):
-        if stock_input.strip():
-            ticker, name = resolve_ticker(stock_input, krx_df)
+    # 종목 분석 (32 FinancialChart 선택 방식 처리)
+    selected_items = [
+        (stock_select1, custom_stock1),
+        (stock_select2, custom_stock2),
+        (stock_select3, custom_stock3)
+    ]
+    for i, (select_val, custom_val) in enumerate(selected_items):
+        target_str = ""
+        if select_val == "[직접 입력]":
+            if custom_val and custom_val.strip():
+                target_str = custom_val.strip()
+        elif select_val and select_val != "선택 안 함":
+            target_str = select_val
+
+        if target_str:
+            ticker, name = resolve_stock_selection(target_str, krx_df)
             if ticker:
-                targets.append((ticker, name, f"종목 {i+1}"))
+                if not any(t[0] == ticker for t in targets):
+                    targets.append((ticker, name, f"종목 {i+1}"))
             else:
-                st.warning(f"종목 입력 '{stock_input}'을 해석할 수 없어 제외했습니다.")
+                st.warning(f"종목 '{target_str}'을(를) 해석할 수 없어 제외했습니다.")
 
     # 지수 분석
     for i, index_select in enumerate([index_select1, index_select2]):
