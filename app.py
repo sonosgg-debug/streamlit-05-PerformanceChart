@@ -14,13 +14,14 @@ st.set_page_config(
 )
 
 # 제목 및 소개
-st.markdown("<h1 style='color: #8AB4F8; margin-bottom: 10px;'>국내외 주식 & 지수 수익률 비교</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-size: 1.8rem; font-weight: 800; color: #8AB4F8; margin-bottom: 10px;'>국내외 주식 & 지수 수익률 비교</h1>", unsafe_allow_html=True)
 st.markdown("""
-<div style="color: #BDC1C6; font-size: 1.0rem; margin-bottom: 20px; line-height: 1.6;">
+<div style="text-align: center; color: #BDC1C6; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
 한국 및 미국 주식과 주요 지수의 누적 수익률을 비교할 수 있는 대시보드입니다.<br/>
 시작일의 자산 가격을 <b>100%</b> 기준으로 설정하여 종료일까지의 상대적인 변동 추이를 백분율(%)로 보여줍니다.
 </div>
 """, unsafe_allow_html=True)
+st.markdown("<hr style='border: 0; height: 1px; background-color: #334155; margin-bottom: 22px;'>", unsafe_allow_html=True)
 
 # --- 데이터 캐싱 및 매핑 로직 ---
 
@@ -446,7 +447,7 @@ if run_button or 'data_loaded' not in st.session_state:
             st.plotly_chart(fig, use_container_width=True, theme=None)
             
             # --- 요약 분석 표 생성 ---
-            st.subheader("📊 비교 분석 요약 테이블")
+            st.markdown("<h3 style='font-size: 1.15rem; font-weight: 700; color: #F8FAFC; margin-top: 25px; margin-bottom: 12px;'><span style='font-size: 1.15rem;'>📊</span> 비교 분석 요약 테이블</h3>", unsafe_allow_html=True)
             
             summary_rows = []
             for display_name, (series, ticker) in original_data_dict.items():
@@ -489,20 +490,18 @@ if run_button or 'data_loaded' not in st.session_state:
             )
             
             # 간단한 성과 비교 인사이트 제공
-            st.markdown("### 💡 주요 성과 인사이트")
+            st.markdown("<h3 style='font-size: 1.15rem; font-weight: 700; color: #F8FAFC; margin-top: 25px; margin-bottom: 12px;'><span style='font-size: 1.15rem;'>💡</span> 주요 성과 인사이트</h3>", unsafe_allow_html=True)
             
             # 최고 수익률 자산 찾기
             best_asset = max(summary_rows, key=lambda x: x["최종 수익률"])
             worst_asset = min(summary_rows, key=lambda x: x["최종 수익률"])
             
-            st.write(
-                f"• 선택한 기간 동안 가장 높은 성과를 낸 자산은 **{best_asset['종목/지수명']}**이며, "
-                f"최종 수익률은 **{format_return(best_asset['최종 수익률'])}**을 기록했습니다."
-            )
-            st.write(
-                f"• 반면 가장 저조한 성과를 낸 자산은 **{worst_asset['종목/지수명']}**이며, "
-                f"최종 수익률은 **{format_return(worst_asset['최종 수익률'])}**을 기록했습니다."
-            )
+            st.markdown(f"""
+            <div style="font-size: 0.88rem; color: #E2E8F0; line-height: 1.7;">
+            • 선택한 기간 동안 가장 높은 성과를 낸 자산은 <b>{best_asset['종목/지수명']}</b>이며, 최종 수익률은 <b>{format_return(best_asset['최종 수익률'])}</b>을 기록했습니다.<br/>
+            • 반면 가장 저조한 성과를 낸 자산은 <b>{worst_asset['종목/지수명']}</b>이며, 최종 수익률은 <b>{format_return(worst_asset['최종 수익률'])}</b>을 기록했습니다.
+            </div>
+            """, unsafe_allow_html=True)
             
         else:
             st.error("가져온 가격 데이터가 모두 비어 있어 차트를 생성하지 못했습니다. 입력 값 및 날짜 범위를 다시 확인해 주세요.")
