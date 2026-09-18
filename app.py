@@ -16,6 +16,14 @@ st.set_page_config(
 # 사이드바 접기/펼치기 버튼 상시 표시 및 모바일 대비 강화 CSS
 st.markdown("""
 <style>
+    /* Headers & Main Title (00 Bookmarks 테마 일치) */
+    h1, .main h1, [data-testid="stHeadingWithActionElements"] h1, .main-title {
+        color: #8AB4F8 !important;
+        -webkit-text-fill-color: #8AB4F8 !important;
+        font-size: 1.9rem !important;
+        font-weight: 800 !important;
+        text-align: center !important;
+    }
 
     /* =========================================================
        사이드바 접기(<<) 및 펼치기(>>) 버튼 항상 표시 및 시인성/대비 강화
@@ -100,7 +108,7 @@ st.markdown("""
 
 
 # 제목 및 소개
-st.markdown("<h1 style='text-align: center; font-size: 1.9rem !important; font-weight: 800 !important; color: #8AB4F8 !important; -webkit-text-fill-color: #8AB4F8 !important; margin-bottom: 10px;'><span style='color: #8AB4F8 !important;'>국내외 주식 & 지수 수익률 비교</span></h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='main-title' style='text-align: center; font-size: 1.9rem !important; font-weight: 800 !important; color: #8AB4F8 !important; -webkit-text-fill-color: #8AB4F8 !important; margin-bottom: 10px;'><span style='color: #8AB4F8 !important; -webkit-text-fill-color: #8AB4F8 !important;'>국내외 주식 & 지수 수익률 비교</span></h1>", unsafe_allow_html=True)
 st.markdown("""
 <div style="text-align: center; color: #BDC1C6; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
 한국 및 미국 주식과 주요 지수의 누적 수익률을 비교할 수 있는 대시보드입니다.<br/>
