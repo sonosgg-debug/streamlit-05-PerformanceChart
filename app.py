@@ -100,7 +100,7 @@ st.markdown("""
 
 
 # 제목 및 소개
-st.markdown("<h1 style='text-align: center; font-size: 1.8rem; font-weight: 800; color: #8AB4F8; margin-bottom: 10px;'>국내외 주식 & 지수 수익률 비교</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-size: 1.9rem; font-weight: 800; color: #8AB4F8; margin-bottom: 10px;'>국내외 주식 & 지수 수익률 비교</h1>", unsafe_allow_html=True)
 st.markdown("""
 <div style="text-align: center; color: #BDC1C6; font-size: 0.9rem; margin-bottom: 20px; line-height: 1.6;">
 한국 및 미국 주식과 주요 지수의 누적 수익률을 비교할 수 있는 대시보드입니다.<br/>
