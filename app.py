@@ -25,6 +25,24 @@ st.markdown("""
         text-align: center !important;
     }
 
+    /* Button Styling (39 DividendStock 표준 스타일 일치) */
+    .stButton button[kind="primary"],
+    .stButton > button[kind="primary"],
+    section[data-testid="stSidebar"] button[kind="primary"] {
+        background-color: #2563eb !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 600 !important;
+        border-radius: 6px !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton button[kind="primary"]:hover,
+    .stButton > button[kind="primary"]:hover,
+    section[data-testid="stSidebar"] button[kind="primary"]:hover {
+        background-color: #1d4ed8 !important;
+        box-shadow: 0 0 10px rgba(37, 99, 235, 0.4) !important;
+    }
+
     /* =========================================================
        사이드바 접기(<<) 및 펼치기(>>) 버튼 항상 표시 및 시인성/대비 강화
        ========================================================= */
@@ -383,7 +401,7 @@ if start_date > end_date:
     st.sidebar.error("시작일은 종료일보다 이전 날짜여야 합니다.")
 
 # 조회 버튼
-run_button = st.sidebar.button("조회하기 🚀", use_container_width=True)
+run_button = st.sidebar.button("🔍 조회", type="primary", use_container_width=True)
 
 # 메인 콘텐츠 실행 로직
 # 첫 실행이거나 조회 버튼을 누른 경우 실행
