@@ -388,72 +388,82 @@ for idx, opt in enumerate(stock_select_options):
         break
 
 # 사이드바 설정
-st.sidebar.header("⚙️ 대시보드 설정")
+with st.sidebar:
+    st.header("⚙️ 대시보드 설정")
 
-st.sidebar.subheader("🔍 종목 선택 (최대 3개)")
-stock_select1 = st.sidebar.selectbox(
-    "종목 1",
-    options=stock_select_options,
-    index=default_idx1,
-    help="키보드로 종목명(예: 삼성전자) 또는 종목코드(예: 005930)를 입력하여 검색할 수 있습니다."
-)
-custom_stock1 = None
-if stock_select1 == "[직접 입력]":
-    custom_stock1 = st.sidebar.text_input("종목 1 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
+    st.subheader("🔍 종목 선택 (최대 3개)")
+    stock_select1 = st.selectbox(
+        "종목 1",
+        options=stock_select_options,
+        index=default_idx1,
+        help="키보드로 종목명(예: 삼성전자) 또는 종목코드(예: 005930)를 입력하여 검색할 수 있습니다."
+    )
+    custom_stock1 = None
+    if stock_select1 == "[직접 입력]":
+        custom_stock1 = st.text_input("종목 1 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
 
-stock_select2 = st.sidebar.selectbox(
-    "종목 2 (선택)",
-    options=stock_select_options,
-    index=default_idx2,
-    help="키보드로 종목명 또는 종목코드를 입력하여 검색할 수 있습니다."
-)
-custom_stock2 = None
-if stock_select2 == "[직접 입력]":
-    custom_stock2 = st.sidebar.text_input("종목 2 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
+    stock_select2 = st.selectbox(
+        "종목 2 (선택)",
+        options=stock_select_options,
+        index=default_idx2,
+        help="키보드로 종목명 또는 종목코드를 입력하여 검색할 수 있습니다."
+    )
+    custom_stock2 = None
+    if stock_select2 == "[직접 입력]":
+        custom_stock2 = st.text_input("종목 2 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
 
-stock_select3 = st.sidebar.selectbox(
-    "종목 3 (선택)",
-    options=stock_select_options,
-    index=0,
-    help="키보드로 종목명 또는 종목코드를 입력하여 검색할 수 있습니다."
-)
-custom_stock3 = None
-if stock_select3 == "[직접 입력]":
-    custom_stock3 = st.sidebar.text_input("종목 3 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
+    stock_select3 = st.selectbox(
+        "종목 3 (선택)",
+        options=stock_select_options,
+        index=0,
+        help="키보드로 종목명 또는 종목코드를 입력하여 검색할 수 있습니다."
+    )
+    custom_stock3 = None
+    if stock_select3 == "[직접 입력]":
+        custom_stock3 = st.text_input("종목 3 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
 
-st.sidebar.subheader("📊 지수 선택 (최대 2개)")
-indices_options = {
-    "KOSPI": "^KS11",
-    "KOSDAQ": "^KQ11",
-    "S&P 500": "^GSPC",
-    "Nasdaq": "^IXIC",
-    "선택 안 함": None
-}
+    st.subheader("📊 지수 선택 (최대 2개)")
+    indices_options = {
+        "KOSPI": "^KS11",
+        "KOSDAQ": "^KQ11",
+        "S&P 500": "^GSPC",
+        "Nasdaq": "^IXIC",
+        "선택 안 함": None
+    }
 
-index_select1 = st.sidebar.selectbox(
-    "지수 선택 1",
-    options=list(indices_options.keys()),
-    index=0  # KOSPI 디폴트
-)
+    index_select1 = st.selectbox(
+        "지수 선택 1",
+        options=list(indices_options.keys()),
+        index=0  # KOSPI 디폴트
+    )
 
-index_select2 = st.sidebar.selectbox(
-    "지수 선택 2",
-    options=list(indices_options.keys()),
-    index=2  # S&P 500 디폴트
-)
+    index_select2 = st.selectbox(
+        "지수 선택 2",
+        options=list(indices_options.keys()),
+        index=2  # S&P 500 디폴트
+    )
 
-st.sidebar.subheader("📅 기간 선택")
-default_start = datetime.date(2026, 1, 1)
-default_end = datetime.date.today()
+    st.subheader("📅 조회 기간")
+    default_start = datetime.date(2026, 1, 1)
+    default_end = datetime.date.today()
 
-start_date = st.sidebar.date_input("시작일", value=default_start)
-end_date = st.sidebar.date_input("종료일", value=default_end)
+    start_date = st.date_input("시작일", value=default_start)
+    end_date = st.date_input("종료일", value=default_end)
 
-if start_date > end_date:
-    st.sidebar.error("시작일은 종료일보다 이전 날짜여야 합니다.")
+    if start_date > end_date:
+        st.error("시작일은 종료일보다 이전 날짜여야 합니다.")
 
-# 조회 버튼
-run_button = st.sidebar.button("🔍 조회", type="primary", use_container_width=True)
+    # 액션 버튼 (Update & 조회)
+    col_btn1, col_btn2 = st.columns(2)
+    with col_btn1:
+        btn_update = st.button("🔄 Update", use_container_width=True, help="캐시를 초기화하고 최신 주가 및 지수 데이터를 다시 수집합니다.")
+    with col_btn2:
+        run_button = st.button("🔍 조회", type="primary", use_container_width=True, help="선택한 조건으로 대시보드를 새로고침합니다.")
+
+    if btn_update:
+        st.cache_data.clear()
+        st.session_state['data_loaded'] = True
+        st.rerun()
 
 # 메인 콘텐츠 실행 로직
 # 첫 실행이거나 조회 버튼을 누른 경우 실행
