@@ -510,6 +510,16 @@ if run_button or 'data_loaded' not in st.session_state:
                     hovertemplate='%{x|%Y-%m-%d}<br><b>' + display_name + '</b>: %{y:.2f}%<extra></extra>'
                 ))
             
+            # 우측 Y축(yaxis2) 활성화를 위한 투명 더미 트레이스 추가 (Plotly 특성상 해당 축에 트레이스가 바인딩되어야 렌더링됨)
+            fig.add_trace(go.Scatter(
+                x=[None],
+                y=[None],
+                mode='markers',
+                yaxis='y2',
+                showlegend=False,
+                hoverinfo='skip'
+            ))
+            
             # 32 FinancialChart 테마 적용 (슬레이트 다크 그레이 & 고대비 텍스트)
             fig.update_layout(
                 title=dict(
