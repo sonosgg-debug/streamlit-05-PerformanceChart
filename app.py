@@ -534,6 +534,17 @@ if run_button or 'data_loaded' not in st.session_state:
                     ticksuffix="%",
                     tickfont=dict(color="#E2E8F0")
                 ),
+                yaxis2=dict(
+                    overlaying="y",
+                    side="right",
+                    matches="y",
+                    showgrid=False,
+                    showline=True,
+                    linewidth=1,
+                    linecolor="#475569",
+                    ticksuffix="%",
+                    tickfont=dict(color="#E2E8F0")
+                ),
                 hovermode="x unified",
                 legend=dict(
                     orientation="h",
@@ -558,7 +569,7 @@ if run_button or 'data_loaded' not in st.session_state:
                 ),
                 plot_bgcolor="#0F172A",   # 고대비 Tailwind Slate-900 딥 블랙 플롯 영역
                 paper_bgcolor="#1E293B",  # 고대비 Tailwind Slate-800 카드 페이퍼 영역
-                margin=dict(l=40, r=40, t=80, b=40),
+                margin=dict(l=50, r=50, t=80, b=40),
                 height=550
             )
             
