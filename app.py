@@ -405,7 +405,7 @@ with st.sidebar:
         """
         <div style='padding: 2px 0 12px 0;'>
             <div style='font-size: 1.25rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px;'>
-                <span>⚙️</span> 대시보드 설정
+                <span>⚙️</span> 조회/분석 설정
             </div>
             <div style='font-size: 0.82rem; color: #94a3b8; margin-top: 4px; line-height: 1.4;'>
                 수익률을 비교 분석할 종목, 지수 및 기간을 설정합니다.
