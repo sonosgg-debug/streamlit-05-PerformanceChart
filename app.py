@@ -786,7 +786,12 @@ if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in
             st.plotly_chart(fig, use_container_width=True, theme=None)
             
             # --- 요약 분석 표 생성 ---
-            st.markdown("<h3 style='font-size: 1.15rem; font-weight: 700; color: #F8FAFC; margin-top: 25px; margin-bottom: 12px;'><span style='font-size: 1.15rem;'>📊</span> 비교 분석 요약 테이블</h3>", unsafe_allow_html=True)
+            st.markdown(
+                "<div style='font-size: 1.20rem; font-weight: 700; color: #8AB4F8; margin: 20px 0 10px 0; display: flex; align-items: center; gap: 8px;'>"
+                "<span>📊</span> 비교 분석 요약 테이블"
+                "</div>",
+                unsafe_allow_html=True
+            )
             
             summary_rows = []
             for display_name, (series, ticker) in original_data_dict.items():
@@ -829,7 +834,12 @@ if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in
             )
             
             # 간단한 성과 비교 인사이트 제공
-            st.markdown("<h3 style='font-size: 1.15rem; font-weight: 700; color: #F8FAFC; margin-top: 25px; margin-bottom: 12px;'><span style='font-size: 1.15rem;'>💡</span> 주요 성과 인사이트</h3>", unsafe_allow_html=True)
+            st.markdown(
+                "<div style='font-size: 1.20rem; font-weight: 700; color: #8AB4F8; margin: 20px 0 10px 0; display: flex; align-items: center; gap: 8px;'>"
+                "<span>💡</span> 주요 성과 인사이트"
+                "</div>",
+                unsafe_allow_html=True
+            )
             
             # 최고 수익률 자산 찾기
             best_asset = max(summary_rows, key=lambda x: x["최종 수익률"])
