@@ -468,12 +468,25 @@ with st.sidebar:
         index=2  # S&P 500 디폴트
     )
 
-    st.subheader("📅 조회 기간")
+    st.markdown("<div style='font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;'>📅 조회 기간</div>", unsafe_allow_html=True)
     default_start = datetime.date(2026, 1, 1)
     default_end = datetime.date.today()
 
-    start_date = st.date_input("시작일", value=default_start)
-    end_date = st.date_input("종료일", value=default_end)
+    col_start, col_end = st.columns(2)
+    with col_start:
+        start_date = st.date_input(
+            "시작일",
+            value=default_start,
+            label_visibility="collapsed",
+            help="조회 시작일"
+        )
+    with col_end:
+        end_date = st.date_input(
+            "종료일",
+            value=default_end,
+            label_visibility="collapsed",
+            help="조회 종료일"
+        )
 
     if start_date > end_date:
         st.error("시작일은 종료일보다 이전 날짜여야 합니다.")
