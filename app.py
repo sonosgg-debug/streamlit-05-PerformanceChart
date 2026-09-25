@@ -721,11 +721,6 @@ if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in
             
             # 32 FinancialChart 테마 적용 (슬레이트 다크 그레이 & 고대비 텍스트)
             fig.update_layout(
-                title=dict(
-                    text=f"<b>수익률 비교 차트 ({start_date} ~ {end_date}, 시작가 = 100%)</b>",
-                    x=0.0,
-                    font=dict(size=18, color="#F8FAFC")
-                ),
                 xaxis=dict(
                     title=dict(text="날짜", font=dict(color="#E2E8F0")),
                     gridcolor="#2A3342",
@@ -778,11 +773,17 @@ if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in
                 ),
                 plot_bgcolor=STANDARD_CHART_THEME['plot_bgcolor'],   # 고대비 Tailwind Slate-900 딥 블랙 플롯 영역
                 paper_bgcolor=STANDARD_CHART_THEME['paper_bgcolor'],  # 고대비 Tailwind Slate-800 카드 페이퍼 영역
-                margin=dict(l=50, r=50, t=80, b=40),
+                margin=dict(l=50, r=50, t=40, b=40),
                 height=550
             )
             
-            # 메인 화면 차트 출력 (theme=None을 설정하여 스트림릿 다크 모드 오버라이드를 방지하고 커스텀 테마를 그대로 유지)
+            # 메인 화면 차트 출력 (Level 2 표준 섹터 제목)
+            st.markdown(
+                f"<div style='font-size: 1.20rem; font-weight: 700; color: #8AB4F8; margin: 20px 0 10px 0; display: flex; align-items: center; gap: 8px;'>"
+                f"<span>📈</span> 수익률 비교 차트 ({start_date} ~ {end_date}, 시작가 = 100%)"
+                f"</div>",
+                unsafe_allow_html=True
+            )
             st.plotly_chart(fig, use_container_width=True, theme=None)
             
             # --- 요약 분석 표 생성 ---
