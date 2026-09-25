@@ -1,5 +1,5 @@
-streamlit
-yfinance
-pandas
+streamlit>=1.35.0
+yfinance>=0.2.35
+pandas>=2.0.0
 plotly
 finance-datareader

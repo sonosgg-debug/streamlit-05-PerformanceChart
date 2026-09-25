@@ -6,6 +6,54 @@ import datetime
 import plotly.graph_objects as go
 import os
 
+STANDARD_CHART_THEME = {
+    'paper_bgcolor': '#1E293B',    # Tailwind Slate-800 (외곽 카드 배경)
+    'plot_bgcolor': '#0F172A',     # Tailwind Slate-900 (내부 딥 블랙 플롯)
+    'text_main': '#F8FAFC',        # 타이틀/헤더 텍스트 (순백색)
+    'text_body': '#E2E8F0',        # 본문 및 축 라벨 (부드러운 화이트)
+    'text_muted': '#CBD5E1',       # 축 눈금 수치 텍스트 (Slate-300)
+    'grid_color': '#334155',       # 그리드 격자선 (Slate-700)
+    'border_color': '#475569',     # 축 기준선 (Slate-600)
+    'legend_bg': 'rgba(30, 41, 59, 0.85)',
+    'legend_border': '#334155',
+    'hover_bg': 'rgba(15, 23, 42, 0.9)',
+    'hover_border': '#334155'
+}
+
+def get_latest_expected_trading_day(target_date: str = None) -> str:
+    """
+    가장 최근 거래 완료된 실제 영업일 YYYY-MM-DD 반환.
+    - target_date가 전달된 경우: 해당 날짜 기준 (또는 직전 영업일)
+    - target_date가 없는 경우: KST 기준 15:45 이전이거나 오늘이 주말/새벽이면 직전 마감 거래일 반환
+    """
+    from datetime import datetime, timezone, timedelta
+    now_kst = datetime.now(timezone(timedelta(hours=9)))
+    if target_date:
+        try:
+            clean_date = str(target_date).replace('-', '')
+            dt = datetime.strptime(clean_date, "%Y%m%d").replace(tzinfo=timezone(timedelta(hours=9)))
+        except Exception:
+            dt = now_kst
+    else:
+        dt = now_kst
+
+    # 평일 15:45 이후에만 당일 종가 확정
+    if dt.weekday() < 5 and (dt.hour > 15 or (dt.hour == 15 and dt.minute >= 45)):
+        return dt.strftime("%Y-%m-%d")
+
+    # 장전, 새벽, 주말: 직전 마감 거래일 산출
+    if dt.weekday() == 0:    # 월요일 장전 -> 지난주 금요일 (3일 전)
+        days_back = 3
+    elif dt.weekday() == 6:  # 일요일 -> 지난주 금요일 (2일 전)
+        days_back = 2
+    elif dt.weekday() == 5:  # 토요일 -> 지난주 금요일 (1일 전)
+        days_back = 1
+    else:                    # 화~금 장전/새벽 -> 전일 (1일 전)
+        days_back = 1
+
+    return (dt - timedelta(days=days_back)).strftime("%Y-%m-%d")
+
+
 # 페이지 설정
 st.set_page_config(
     page_title="주식 & 지수 수익률 비교",
@@ -16,6 +64,11 @@ st.set_page_config(
 # 사이드바 접기/펼치기 버튼 상시 표시 및 모바일 대비 강화 CSS
 st.markdown("""
 <style>
+    /* Streamlit 고정 상단 헤더 배경 투명화 */
+    header[data-testid="stHeader"] {
+        background: transparent !important;
+    }
+
     /* 메인 콘텐츠 상단 여백 규격화 */
     .main .block-container,
     [data-testid="stMainBlockContainer"],
@@ -432,7 +485,7 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-    st.subheader("🔍 종목 선택 (최대 3개)")
+    st.markdown("<div style='font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;'>🔍 종목 선택 (최대 3개)</div>", unsafe_allow_html=True)
     stock_select1 = st.selectbox(
         "종목 1",
         options=stock_select_options,
@@ -463,7 +516,7 @@ with st.sidebar:
     if stock_select3 == "[직접 입력]":
         custom_stock3 = st.text_input("종목 3 직접 입력 (코드/티커)", placeholder="예: AAPL, TSLA, 005930")
 
-    st.subheader("📊 지수 선택 (최대 2개)")
+    st.markdown("<div style='font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;'>📊 지수 선택 (최대 2개)</div>", unsafe_allow_html=True)
     indices_options = {
         "KOSPI": "^KS11",
         "KOSDAQ": "^KQ11",
@@ -484,7 +537,7 @@ with st.sidebar:
         index=2  # S&P 500 디폴트
     )
 
-    today = datetime.date.today()
+    today = datetime.datetime.strptime(get_latest_expected_trading_day(), "%Y-%m-%d").date()
     if 'perf_start_date' not in st.session_state:
         st.session_state.perf_start_date = datetime.date(today.year, 1, 1)
     if 'perf_end_date' not in st.session_state:
@@ -720,8 +773,8 @@ if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in
                     family="Pretendard, Malgun Gothic, -apple-system, sans-serif",
                     color="#E2E8F0"
                 ),
-                plot_bgcolor="#0F172A",   # 고대비 Tailwind Slate-900 딥 블랙 플롯 영역
-                paper_bgcolor="#1E293B",  # 고대비 Tailwind Slate-800 카드 페이퍼 영역
+                plot_bgcolor=STANDARD_CHART_THEME['plot_bgcolor'],   # 고대비 Tailwind Slate-900 딥 블랙 플롯 영역
+                paper_bgcolor=STANDARD_CHART_THEME['paper_bgcolor'],  # 고대비 Tailwind Slate-800 카드 페이퍼 영역
                 margin=dict(l=50, r=50, t=80, b=40),
                 height=550
             )
