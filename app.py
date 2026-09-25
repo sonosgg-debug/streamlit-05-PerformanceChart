@@ -107,6 +107,22 @@ st.markdown("""
         -webkit-text-fill-color: #f8fafc !important;
     }
 
+    /* Sidebar button horizontal layout styling (빠른 선택 버튼 등) */
+    section[data-testid="stSidebar"] div.stButton > button {
+        border-radius: 6px !important;
+        font-weight: 700 !important;
+        padding-left: 2px !important;
+        padding-right: 2px !important;
+        padding-top: 4px !important;
+        padding-bottom: 4px !important;
+        min-height: 34px !important;
+        height: 34px !important;
+        white-space: nowrap !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
     /* =========================================================
        사이드바 접기(<<) 및 펼치기(>>) 버튼 항상 표시 및 시인성/대비 강화
        ========================================================= */
@@ -468,25 +484,58 @@ with st.sidebar:
         index=2  # S&P 500 디폴트
     )
 
+    today = datetime.date.today()
+    if 'perf_start_date' not in st.session_state:
+        st.session_state.perf_start_date = datetime.date(today.year, 1, 1)
+    if 'perf_end_date' not in st.session_state:
+        st.session_state.perf_end_date = today
+    if 'selected_preset' not in st.session_state:
+        st.session_state.selected_preset = "YTD"
+
     st.markdown("<div style='font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 6px;'>📅 조회 기간</div>", unsafe_allow_html=True)
-    default_start = datetime.date(2026, 1, 1)
-    default_end = datetime.date.today()
 
     col_start, col_end = st.columns(2)
     with col_start:
         start_date = st.date_input(
             "시작일",
-            value=default_start,
+            value=st.session_state.perf_start_date,
             label_visibility="collapsed",
             help="조회 시작일"
         )
     with col_end:
         end_date = st.date_input(
             "종료일",
-            value=default_end,
+            value=st.session_state.perf_end_date,
             label_visibility="collapsed",
             help="조회 종료일"
         )
+
+    # 캘린더에서 사용자가 직접 날짜를 바꾼 경우 세션 상태 갱신
+    if start_date != st.session_state.perf_start_date or end_date != st.session_state.perf_end_date:
+        st.session_state.perf_start_date = start_date
+        st.session_state.perf_end_date = end_date
+        st.session_state.selected_preset = None
+
+    # 빠른 날짜 선택 프리셋 버튼 (3M, 6M, 1Y, YTD, MAX)
+    st.markdown("<div style='font-size: 0.82rem; color: #94a3b8; margin: 10px 0 6px 0; font-weight: 600;'>⚡ 빠른 선택</div>", unsafe_allow_html=True)
+    preset_cols = st.columns(5)
+    presets = [
+        ("3M", today - datetime.timedelta(days=90), "최근 3개월 (90일)"),
+        ("6M", today - datetime.timedelta(days=180), "최근 6개월 (180일)"),
+        ("1Y", today - datetime.timedelta(days=365), "최근 1년 (365일)"),
+        ("YTD", datetime.date(today.year, 1, 1), f"{today.year}년 연초 이후 (YTD)"),
+        ("MAX", today - datetime.timedelta(days=365*5), "최근 5년 (전체)")
+    ]
+
+    for idx, (p_name, p_start, p_help) in enumerate(presets):
+        with preset_cols[idx]:
+            is_active = (st.session_state.get('selected_preset') == p_name)
+            if st.button(p_name, key=f"btn_preset_{p_name}", type="primary" if is_active else "secondary", use_container_width=True, help=p_help):
+                st.session_state.selected_preset = p_name
+                st.session_state.perf_start_date = p_start
+                st.session_state.perf_end_date = today
+                st.session_state['need_run'] = True
+                st.rerun()
 
     if start_date > end_date:
         st.error("시작일은 종료일보다 이전 날짜여야 합니다.")
@@ -500,12 +549,13 @@ with st.sidebar:
 
     if btn_update:
         st.cache_data.clear()
-        st.session_state['data_loaded'] = True
+        st.session_state['need_run'] = True
         st.rerun()
 
 # 메인 콘텐츠 실행 로직
-# 첫 실행이거나 조회 버튼을 누른 경우 실행
-if run_button or 'data_loaded' not in st.session_state:
+# 첫 실행이거나 조회 버튼 또는 프리셋 변경 시 실행
+if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in st.session_state:
+    st.session_state['need_run'] = False
     st.session_state['data_loaded'] = True
     
     # 1. 입력 종목 및 지수 리스트 정리
