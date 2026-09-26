@@ -1,5 +1,5 @@
 import socket
-socket.setdefaulttimeout(5.0)
+socket.setdefaulttimeout(15.0)
 
 import streamlit as st
 import pandas as pd
@@ -661,16 +661,27 @@ if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in
             
             for ticker, display_name, category in targets:
                 try:
-                    # Ticker.history를 사용하여 데이터 가져오기
-                    t_obj = yf.Ticker(ticker)
-                    df = t_obj.history(start=start_date, end=yf_end_date)
+                    is_kr_stock = ticker.endswith('.KS') or ticker.endswith('.KQ')
+                    is_kr_index = ticker in ['^KS11', '^KQ11']
                     
-                    if df.empty:
+                    if is_kr_stock:
+                        code = ticker.replace('.KS', '').replace('.KQ', '')
+                        df = fdr.DataReader(code, start_date, yf_end_date)
+                    elif is_kr_index:
+                        fdr_code = 'KS11' if ticker == '^KS11' else 'KQ11'
+                        df = fdr.DataReader(fdr_code, start_date, yf_end_date)
+                    else:
+                        t_obj = yf.Ticker(ticker)
+                        df = t_obj.history(start=start_date, end=yf_end_date)
+                    
+                    if df is None or df.empty:
                         st.warning(f"⚠️ '{display_name}' ({ticker})의 가격 데이터가 선택한 기간에 존재하지 않습니다.")
                         continue
                     
                     # 시간대 정보 제거 및 일자 단위 정규화
-                    df.index = df.index.tz_localize(None).normalize()
+                    if df.index.tz is not None:
+                        df.index = df.index.tz_localize(None)
+                    df.index = df.index.normalize()
                     
                     # Close 값 사용
                     series = df['Close'].dropna()
@@ -723,6 +734,8 @@ if run_button or st.session_state.get('need_run', False) or 'data_loaded' not in
             fig.update_layout(
                 xaxis=dict(
                     title=dict(text="날짜", font=dict(color="#E2E8F0")),
+                    tickformat="%Y-%m-%d",
+                    hoverformat="%Y-%m-%d",
                     gridcolor="#2A3342",
                     showline=True,
                     linewidth=1,
